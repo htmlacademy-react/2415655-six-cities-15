@@ -1,7 +1,8 @@
-import { TCard, TOpenCard, TReview } from '../mocks/types';
+import { TCard, TOpenCard, TReview, TUserLogIn } from '../mocks/types';
 import { AuthorizationStatus, CITIES, CityName, SortOptions, TSortOptions } from '../const';
 import { createReducer } from '@reduxjs/toolkit';
-import { changeSort, chooseCity, getCards, setComments, setLoading, setNearOffers, setOffer, switchAutorizationStatus } from './action';
+import { changeSort, chooseCity, getCards, getFavoriteCards, setComments, setLoading, setNearOffers, setOffer, setUserInfo, switchAutorizationStatus, switchFavorite } from './action';
+import { changeFavoriteStatus, fetchFavoriteCards } from './api-actions';
 
 type initialStateType = {
   city: CityName;
@@ -9,12 +10,20 @@ type initialStateType = {
     cards: TOpenCard[];
     isLoading: boolean;
   };
+  favorite: {
+    cards: TOpenCard[];
+    isFavorite: boolean;
+    isLoadingChangeStatus: boolean;
+  };
   sortOption: TSortOptions;
   authorizationStatus: AuthorizationStatus;
+  userInfo: TUserLogIn | null;
   offer: {
     offerInfo: TCard | null;
+    card: TCard[];
     nearbyCards: TOpenCard[];
     comments: TReview[];
+    isFavorite: boolean;
   };
 };
 
@@ -25,11 +34,19 @@ const initialState: initialStateType = {
     cards: [],
     isLoading: false
   },
+  favorite: {
+    cards: [],
+    isFavorite: false,
+    isLoadingChangeStatus: false,
+  },
   authorizationStatus: AuthorizationStatus.Unknown,
+  userInfo: null,
   offer: {
     offerInfo: null,
     nearbyCards: [],
     comments: [],
+    isFavorite: false,
+    card: []
   },
 };
 
@@ -58,6 +75,27 @@ const reducer = createReducer(initialState, (builder)=> {
   });
   builder.addCase(setComments, (state, action) => {
     state.offer.comments = action.payload;
+  });
+  builder.addCase(setUserInfo, (state, action) => {
+    state.userInfo = action.payload;
+  });
+  builder.addCase(switchFavorite, (state, action) => {
+    state.favorite.cards = action.payload.cards;
+  });
+  builder.addCase(getFavoriteCards , (state, action) => {
+    state.favorite.cards = action.payload.cards;
+  });
+  builder.addCase(fetchFavoriteCards.fulfilled, (state, action) => {
+    state.favorite.cards = action.payload;
+  });
+  builder.addCase(changeFavoriteStatus.fulfilled, (state, action) => {
+    const index = state.offers.cards.findIndex((item) => item.id === action.payload.id);
+    if (index !== -1) {
+      state.offers.cards[index].isFavorite = action.payload.isFavorite;
+    }
+    if (state.offer.offerInfo && state.offer.offerInfo.id === action.payload.id) {
+      state.offer.offerInfo.isFavorite = action.payload.isFavorite;
+    }
   });
 });
 

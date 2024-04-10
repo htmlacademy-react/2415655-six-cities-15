@@ -99,3 +99,23 @@ export enum APIRoutes {
   Login = '/login',
   Logout = '/logout'
 }
+
+export enum NameSpace {
+  City = 'CITY',
+  User = 'USER',
+  Cards = 'CARDS',
+  Offer = 'OFFER'
+}
+
+export const RatingNames: {[index: string]: string} = {
+  '1': 'terribly',
+  '2': 'badly',
+  '3': 'not bad',
+  '4': 'good',
+  '5': 'perfect'
+};
+
+export enum FavoritesStatus {
+  Added = 1,
+  Removed = 0
+}

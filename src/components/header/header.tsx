@@ -1,17 +1,35 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppRoute, AuthorizationStatus } from '../../const';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { logoutAction } from '../../store/api-actions';
 
 function Header(): JSX.Element {
+  const userInfo = useAppSelector((state) => state.userInfo);
+
+  const offers = useAppSelector((state) => state.offers.cards);
+  const favoriteOffers = offers.filter((card) => card.isFavorite);
+
   const authorizationStatus = useAppSelector((state) => state.authorizationStatus);
   const {pathname} = useLocation();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
   const isLoginPage = pathname === AppRoute.Login;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+  const isFavoritePage = pathname === AppRoute.Favorites;
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
 
   const handleLogOut = () => {
-    dispatch(logoutAction());
+    dispatch(logoutAction())
+      .then((response) => {
+        if (response.meta.requestStatus === 'fulfilled') {
+          if (isFavoritePage) {
+            navigate(AppRoute.Login);
+          } else {
+            navigate(AppRoute.Root);
+          }
+        }
+      });
   };
 
   return (
@@ -31,8 +49,8 @@ function Header(): JSX.Element {
                     <Link className="header__nav-link header__nav-link--profile" to={AppRoute.Favorites}>
                       <div className="header__avatar-wrapper user__avatar-wrapper">
                       </div>
-                      <span className="header__user-name user__name">Oliver.conner@gmail.com</span>
-                      <span className="header__favorite-count">3</span>
+                      <span className="header__user-name user__name">{userInfo && userInfo.email}</span>
+                      <span className="header__favorite-count">{favoriteOffers.length}</span>
                     </Link>
                   </li>
                 )}

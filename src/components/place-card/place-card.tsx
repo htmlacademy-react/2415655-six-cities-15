@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { TOpenCard } from '../../mocks/types';
+import FavoritesButton from '../favorites-button/favorites-button';
 
 export type PlaceCardProps = {
   card: TOpenCard;
@@ -7,7 +8,7 @@ export type PlaceCardProps = {
 }
 
 function PlaceCard({ card, handleHover }: PlaceCardProps): JSX.Element {
-  const {id, title, type, price, isPremium, isFavorite, previewImage} = card;
+  const {id, title, type, price, isPremium, isFavorite, previewImage, rating} = card;
 
 
   const handleMouseOn = () => {
@@ -42,31 +43,16 @@ function PlaceCard({ card, handleHover }: PlaceCardProps): JSX.Element {
             <b className="place-card__price-value">&euro;{price}</b>
             <span className="place-card__price-text">&#47;&nbsp;night</span>
           </div>
-          {isFavorite && (
-            <button className="place-card__bookmark-button--active button" type="button">
-              <svg className="place-card__bookmark-icon" width="18" height="19">
-                <use xlinkHref="#icon-bookmark"></use>
-              </svg>
-              <span className="visually-hidden">To bookmarks</span>
-            </button>
-          )}
-          {!isFavorite && (
-            <button className="place-card__bookmark-button button" type="button">
-              <svg className="place-card__bookmark-icon" width="18" height="19">
-                <use xlinkHref="#icon-bookmark"></use>
-              </svg>
-              <span className="visually-hidden">To bookmarks</span>
-            </button>
-          )}
+          <FavoritesButton isFavorite={isFavorite} cardId={id} />
         </div>
         <div className="place-card__rating rating">
           <div className="place-card__stars rating__stars">
-            <span style={{ width: '80%' }}></span>
+            <span style={{width: `${Math.round(rating) * 20}%`}}></span>
             <span className="visually-hidden">Rating</span>
           </div>
         </div>
         <h2 className="place-card__name">
-          <a href="#">{title}</a>
+          <Link to={`/offer/${id}`}>{title}</Link>
         </h2>
         <p className="place-card__type">{type}</p>
       </div>
